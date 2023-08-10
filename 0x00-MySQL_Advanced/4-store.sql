@@ -2,6 +2,7 @@
 -- Quantity in the table items can be negative.
 
 DELIMITER $$
+
 CREATE TRIGGER update_quantity AFTER INSERT ON orders
 FOR EACH ROW
 BEGIN
@@ -9,4 +10,5 @@ BEGIN
     SET quantity = quantity - 1
     WHERE id = NEW.item_id;
 END$$
+
 DELIMITER ;
