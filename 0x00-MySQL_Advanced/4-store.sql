@@ -3,11 +3,17 @@
 
 DELIMITER $$
 
-CREATE TRIGGER update_quantity AFTER INSERT ON orders
+CREATE TRIGGER update_quantity
+AFTER INSERT ON orders
 FOR EACH ROW
 BEGIN
+    -- Calculate the total quantity to be deducted
+    DECLARE total_quantity INT;
+    SET total_quantity = NEW.quantity;
+
+    -- Decrease the quantity of the corresponding item
     UPDATE items
-    SET quantity = quantity - 1
+    SET quantity = quantity - total_quantity
     WHERE id = NEW.item_id;
 END$$
 
