@@ -5,7 +5,7 @@
 -- Column names must be: origin and nb_fans
 -- Your script can be executed on any database
 
-SELECT origin, COUNT(*) AS nb_fans
+SELECT origin, SUM(nb_fans) AS total_fans
 FROM metal_bands
 GROUP BY origin
-ORDER BY nb_fans DESC;
+ORDER BY total_fans DESC;
