@@ -1,3 +1,25 @@
 // a script that inserts a document in the collection school:
 
-db.school.insert({"name": "Holberton school”});
+#!/bin/bash
+
+# Function to display usage information
+show_usage() {
+    echo "Usage: $0 <database_name> <collection_name>"
+}
+
+# Check if the correct number of arguments are provided
+if [ $# -lt 2 ]; then
+    show_usage
+    exit 1
+fi
+
+# Assign arguments to variables for better readability
+database_name="$1"
+collection_name="$2"
+
+# MongoDB command to insert the document
+mongo_command="db.${collection_name}.insertOne({ \"name\": \"Holberton school\" })"
+
+# Execute the MongoDB command with the specified database
+mongo "$database_name" --eval "$mongo_command"
+
