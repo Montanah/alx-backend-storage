@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """Creating a Cache class."""
 
-import sys
 import redis
 from uuid import uuid4
 from typing import Union, Callable
@@ -21,7 +20,7 @@ class Cache:
         self._redis.mset({key: data})
         return key
 
-    def get(self, key: str, fn: Optional[Callable] = None) -> Union
+    def get(self, key: str, fn: Callable = None) -> Union
     [str, bytes, int, float, None]:
         """
         method that take a key string argument and an optional Callable
@@ -36,8 +35,8 @@ class Cache:
 
     def get_int(self: bytes) -> int:
         """getting a number"""
-        return int.from_bytes(self, sys.byteorder)
+        return self.get(key, int)
 
     def get_str(self: bytes) -> str:
-        """getingt a string"""
-        return self.decode("utf-8")
+        """getting a string"""
+        return self.get(key, lambda x: x.decode("utf-8"))
