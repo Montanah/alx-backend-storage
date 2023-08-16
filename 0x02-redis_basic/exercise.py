@@ -12,18 +12,12 @@ def count_calls(method: Callable) -> Callable:
     decorator that takes a single method Callable argument and returns a
     Callable
     """
-
-    key = method. __qualname__
-
-    def wrapper(self, *args, **kwargs):
-        """
-        return function that increments the count for that key every time the
-        method is called and returns the value returned by the original method.
-        """
-        self._redis.incr(key)
-        return method(self, *args, **kwargs)
-
-    return wrapper
+    @functools.wraps(method)
+        def wrapper(self, *args, **kwargs):
+            key = method.__qualname__
+            self._redis.incr(key)
+            return method(self, *args, **kwargs)
+        return wrapper
 
 
 class Cache:
