@@ -34,7 +34,9 @@ class Cache:
         return fn(data)
 
     def get_str(self, key: str) -> str:
-        return self.get(key, lambda x: x.decode("utf-8"))
+        """getting a string"""
+        return self.get(key, lambda d: d.decode("utf-8"))
 
     def get_int(self, key: str) -> int:
+        """Getting a number"""
         return self.get(key, int)
