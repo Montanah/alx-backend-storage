@@ -2,8 +2,27 @@
 """Creating a Cache class."""
 
 import redis
+from functools import wraps
 from uuid import uuid4
 from typing import Union, Callable
+
+
+def count_calls(method: Callable) -> Callable:
+   """
+   decorator that takes a single method Callable argument and returns a Callable
+   """
+
+   key = method. __qualname__
+
+   def wrapper(self, *args, **kwargs):
+        """
+        return function that increments the count for that key every time the
+        method is called and returns the value returned by the original method.
+        """
+        self._redis.incr(key)
+        return method(self, *args, **kwargs)
+
+    return wrapper
 
 
 class Cache:
@@ -21,7 +40,7 @@ class Cache:
         return key
 
     def get(self, key: str, fn: Optional[Callable] = None) -> Union
-    [str, bytes, int, float]:
+    [str, bytes, int, float, None]:
         """
         method that take a key string argument and an optional Callable
         argument named fn
