@@ -20,8 +20,8 @@ class Cache:
         self._redis.mset({key: data})
         return key
 
-    def get(self, key: str, fn: Callable = None) -> Union
-    [str, bytes, int, float, None]:
+    def get(self, key: str, fn: Optional[Callable] = None) -> Union
+    [str, bytes, int, float]:
         """
         method that take a key string argument and an optional Callable
         argument named fn
