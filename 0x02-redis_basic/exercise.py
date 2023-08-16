@@ -8,13 +8,14 @@ from typing import Union, Callable
 
 
 def count_calls(method: Callable) -> Callable:
-   """
-   decorator that takes a single method Callable argument and returns a Callable
-   """
+    """
+    decorator that takes a single method Callable argument and returns a
+    Callable
+    """
 
-   key = method. __qualname__
+    key = method. __qualname__
 
-   def wrapper(self, *args, **kwargs):
+    def wrapper(self, *args, **kwargs):
         """
         return function that increments the count for that key every time the
         method is called and returns the value returned by the original method.
