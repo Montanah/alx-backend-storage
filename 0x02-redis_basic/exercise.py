@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Creating a Cache class."""
 
+import sys
 import redis
 from functools import wraps
 from uuid import uuid4
@@ -34,7 +35,7 @@ def call_history(method: Callable) -> Callable:
     i = "".join([key, ":inputs"])
     o = "".join([key, ":outputs"])
 
-    @wraps(method)
+    @functools.wraps(method)
     def wrapper(self, *args, **kwargs):
         """ appending the input arguments. """
         self._redis.rpush(i, str(args))
