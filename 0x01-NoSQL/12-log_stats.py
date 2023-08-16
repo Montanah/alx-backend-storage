@@ -13,7 +13,13 @@ if __name__ == "__main__":
     """
     client = MongoClient('mongodb://localhost:27017')
     logs = client.logs.nginx
-    
+
+    # Access the database and collection
+    database_name = 'logs'
+    collection_name = 'nginx'
+    db = client[database_name]
+    collection = db[collection_name]
+        
     # Total number of logs
     total_logs = logs.count_documents({})
     print("{} logs".format(total_logs))
