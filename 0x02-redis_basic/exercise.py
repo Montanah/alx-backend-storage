@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Creating a Cache class."""
 
+import sys
 import redis
 from uuid import uuid4
 from typing import Union, Callable
@@ -33,10 +34,10 @@ class Cache:
             return data
         return fn(data)
 
-    def get_str(self, key: str) -> str:
-        """getting a string"""
-        return self.get(key, lambda d: d.decode("utf-8"))
+    def get_int(self: bytes) -> int:
+        """getting a number"""
+        return int.from_bytes(self, sys.byteorder)
 
-    def get_int(self, key: str) -> int:
-        """Getting a number"""
-        return self.get(key, int)
+    def get_str(self: bytes) -> str:
+        """getingt a string"""
+        return self.decode("utf-8")
