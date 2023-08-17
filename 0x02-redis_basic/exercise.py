@@ -9,50 +9,32 @@ from typing import Optional, Union, Callable
 
 
 def count_calls(method: Callable) -> Callable:
-    """
-    decorator that takes a single method Callable argument and returns a
-    Callable
-    """
-    @functools.wraps(method)
-        def wrapper(self, *args, **kwargs):
-            """
-            function that increments the count for that key every time the
-            method is called and returns the value returned by the original
-            method.
-            """
-            key = method.__qualname__
-            self._redis.incr(key)
-            return method(self, *args, **kwargs)
+    """Count the number of times a method is called"""
+    key = method.__qualname__
 
-        return wrapper
+    @wraps(method)
+    def wrapper(self, *args, **kwargs):
+        """Wrapper function"""
+        self._redis.incr(key)
+        return method(self, *args, **kwargs)
+
+    return wrapper
 
 
- @functools.lru_cache(maxsize=None)
-    def store(self, data):
-        key = str(uuid.uuid4())
-        self._redis.set(key, data)
-        return key
+def call_history(method: Callable) -> Callable:
+    """Store the history of inputs and outputs for a particular function"""
+    @wraps(method)
+    def wrapper(self, *args, **kwargs):
+        """Wrapper function"""
+        input = str(args)
+        self._redis.rpush(method.__qualname__ + ":inputs", input)
 
-    def call_history(method: Callable) -> Callable:
-        """appending the input arguments"""
-        @functools.wraps(method)
-        def wrapper(self, *args, **kwargs):
-            input_key = f"{method.__qualname__}:inputs"
-            output_key = f"{method.__qualname__}:outputs"
-            
-            # Store input arguments as a normalized string
-            input_data = str(args)
-            self._redis.rpush(input_key, input_data)
-            
-            # Execute the wrapped function to retrieve the output
-            output = method(self, *args, **kwargs)
-            
-            # Store the output in the Redis list
-            self._redis.rpush(output_key, output)
-            
-            return output
+        output = str(method(self, *args, **kwargs))
+        self._redis.rpush(method.__qualname__ + ":outputs", output)
 
-        return wrapper
+        return output
+
+    return wrapper
 
 
 class Cache:
@@ -69,8 +51,9 @@ class Cache:
         self._redis.mset({key: data})
         return key
 
-    def get(self, key: str, fn: Optional[Callable] = None)-> Union[str, bytes,
-    int, float, None]:
+    def get(self, key: str, fn: Optional[Callable] = None) -> Union[str, bytes,
+                                                                    int, float,
+                                                                    None]:
         """
         method that take a key string argument and an optional Callable
         argument named fn
@@ -89,3 +72,19 @@ class Cache:
     def get_str(self: bytes) -> str:
         """getting a string"""
         return self.get(key, lambda x: x.decode("utf-8"))
+
+
+def replay(method: Callable):
+    """Display the history of calls of a particular function"""
+    r = redis.Redis()
+    name = method.__qualname__
+    count = r.get(name).decode('utf-8')
+    inputs = r.lrange(name + ":inputs", 0, -1)
+    outputs = r.lrange(name + ":outputs", 0, -1)
+
+    print("{} was called {} times:".format(name, count))
+
+    for i, o in zip(inputs, outputs):
+        print("{}(*{}) -> {}".format(name, i.decode('utf-8'),
+                                     o.decode('utf-8')))
+    return method
